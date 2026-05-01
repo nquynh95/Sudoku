@@ -1,14 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Heart, Lightbulb, Undo, Eraser, PencilLine } from 'lucide-react';
 
 type CellValue = number | null;
 type NoteSet = Set<number>;
+
+export interface SavedGame {
+  grid: (number | null)[][];
+  initialGrid: (number | null)[][];
+  solution: number[][];
+  notes: number[][][];
+  time: number;
+  lives: number;
+  errors: boolean[][];
+  hintsUsed: number;
+  totalErrors: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
 
 interface SudokuGameProps {
   difficulty: 'easy' | 'medium' | 'hard';
   onBack: () => void;
   onWin: (stats: GameStats, solution: number[][], userGrid: (number | null)[][], initialGrid: (number | null)[][]) => void;
   onLose: (solution: number[][], userGrid: (number | null)[][], initialGrid: (number | null)[][], reason?: string) => void;
+  savedGame: SavedGame | null;
+  onSaveGame: (game: SavedGame) => void;
 }
 
 interface GameStats {
@@ -17,7 +32,7 @@ interface GameStats {
   hintsUsed: number;
 }
 
-export default function SudokuGame({ difficulty, onBack, onWin, onLose }: SudokuGameProps) {
+export default function SudokuGame({ difficulty, onBack, onWin, onLose, savedGame, onSaveGame }: SudokuGameProps) {
   const [grid, setGrid] = useState<CellValue[][]>([]);
   const [solution, setSolution] = useState<number[][]>([]);
   const [initialGrid, setInitialGrid] = useState<CellValue[][]>([]);
@@ -30,10 +45,11 @@ export default function SudokuGame({ difficulty, onBack, onWin, onLose }: Sudoku
   const [pencilMode, setPencilMode] = useState(false);
   const [notes, setNotes] = useState<NoteSet[][]>([]);
   const [history, setHistory] = useState<{grid: CellValue[][], notes: NoteSet[][]}[]>([]);
+  const isRestoring = useRef(false);
 
   useEffect(() => {
     initializeGame();
-  }, [difficulty]);
+  }, [difficulty, savedGame]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -60,7 +76,39 @@ export default function SudokuGame({ difficulty, onBack, onWin, onLose }: Sudoku
     }
   }, [grid]);
 
+  useEffect(() => {
+    if (!isRestoring.current && grid.length > 0 && solution.length > 0) {
+      onSaveGame({
+        grid,
+        initialGrid,
+        solution,
+        notes: notes.map(row => row.map(set => Array.from(set))),
+        time,
+        lives,
+        errors,
+        hintsUsed,
+        totalErrors,
+        difficulty
+      });
+    }
+  }, [time, grid, notes, lives, errors, onSaveGame, difficulty]);
+
   const initializeGame = () => {
+    if (savedGame) {
+      isRestoring.current = true;
+      setGrid(savedGame.grid);
+      setInitialGrid(savedGame.initialGrid);
+      setSolution(savedGame.solution);
+      setNotes(savedGame.notes.map((row: number[][]) => row.map((arr: number[]) => new Set<number>(arr))));
+      setTime(savedGame.time);
+      setLives(savedGame.lives);
+      setErrors(savedGame.errors);
+      setHintsUsed(savedGame.hintsUsed);
+      setTotalErrors(savedGame.totalErrors);
+      setTimeout(() => isRestoring.current = false, 0);
+      return;
+    }
+
     const newSolution = generateSudoku();
     const newGrid = createPuzzle(newSolution, difficulty);
     setSolution(newSolution);

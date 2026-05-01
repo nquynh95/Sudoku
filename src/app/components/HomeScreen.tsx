@@ -8,9 +8,10 @@ interface HomeScreenProps {
     bestTime: number;
     currentStreak: number;
   };
+  hasSavedGame: boolean;
 }
 
-export default function HomeScreen({ onStartGame, onContinue, stats }: HomeScreenProps) {
+export default function HomeScreen({ onStartGame, onContinue, stats, hasSavedGame }: HomeScreenProps) {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -52,7 +53,12 @@ export default function HomeScreen({ onStartGame, onContinue, stats }: HomeScree
 
             <button
               onClick={onContinue}
-              className="w-full py-4 px-6 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition font-bold text-lg"
+              disabled={!hasSavedGame}
+              className={`w-full py-4 px-6 rounded-xl transition font-bold text-lg ${
+                hasSavedGame
+                  ? 'bg-sky-500 text-white hover:bg-sky-600'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
             >
               Chơi tiếp ván cũ
             </button>
