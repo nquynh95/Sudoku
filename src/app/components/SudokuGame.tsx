@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Heart, Lightbulb, Undo, Eraser, PencilLine } from 'lucide-react';
+import { isValid, fillGrid, generateSudoku, createPuzzle, isGameComplete, formatTime } from '../utils/sudokuUtils';
 
 type CellValue = number | null;
 type NoteSet = Set<number>;
@@ -71,7 +72,7 @@ export default function SudokuGame({ difficulty, onBack, onWin, onLose, savedGam
   }, [lives, onLose]);
 
   useEffect(() => {
-    if (isGameComplete()) {
+    if (isGameComplete(grid, solution)) {
       onWin({ time, errors: totalErrors, hintsUsed }, solution, grid, initialGrid);
     }
   }, [grid]);
@@ -121,60 +122,6 @@ export default function SudokuGame({ difficulty, onBack, onWin, onLose, savedGam
     setTime(0);
     setHintsUsed(0);
     setTotalErrors(0);
-  };
-
-  const generateSudoku = (): number[][] => {
-    const grid = Array(9).fill(null).map(() => Array(9).fill(0));
-    fillGrid(grid);
-    return grid;
-  };
-
-  const fillGrid = (grid: number[][]): boolean => {
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (grid[row][col] === 0) {
-          const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
-          for (const num of numbers) {
-            if (isValid(grid, row, col, num)) {
-              grid[row][col] = num;
-              if (fillGrid(grid)) return true;
-              grid[row][col] = 0;
-            }
-          }
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  const isValid = (grid: number[][], row: number, col: number, num: number): boolean => {
-    for (let x = 0; x < 9; x++) {
-      if (grid[row][x] === num || grid[x][col] === num) return false;
-    }
-    const boxRow = Math.floor(row / 3) * 3;
-    const boxCol = Math.floor(col / 3) * 3;
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (grid[boxRow + i][boxCol + j] === num) return false;
-      }
-    }
-    return true;
-  };
-
-  const createPuzzle = (solution: number[][], difficulty: string): CellValue[][] => {
-    const puzzle = JSON.parse(JSON.stringify(solution));
-    const cellsToRemove = difficulty === 'easy' ? 40 : difficulty === 'medium' ? 50 : 60;
-    let removed = 0;
-    while (removed < cellsToRemove) {
-      const row = Math.floor(Math.random() * 9);
-      const col = Math.floor(Math.random() * 9);
-      if (puzzle[row][col] !== null) {
-        puzzle[row][col] = null;
-        removed++;
-      }
-    }
-    return puzzle;
   };
 
   const saveHistory = () => {
@@ -272,29 +219,6 @@ export default function SudokuGame({ difficulty, onBack, onWin, onLose, savedGam
     setNotes(newNotes);
 
     setHintsUsed(hintsUsed + 1);
-  };
-
-  const isGameComplete = (): boolean => {
-    if (!grid || grid.length === 0 || !solution || solution.length === 0) {
-      return false;
-    }
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (!grid[row] || !solution[row]) {
-          return false;
-        }
-        if (grid[row][col] === null || grid[row][col] !== solution[row][col]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const getTimeColor = (): string => {
