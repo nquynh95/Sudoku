@@ -41,14 +41,7 @@ npm run test
 Dự án sử dụng **Vitest** cho unit test các hàm logic cốt lõi (`generateSudoku`, `isValid`, `createPuzzle`, `isGameComplete`, `formatTime`, `getStars`).
 Hiện tại có **22 test case tự động** đang pass. Toàn bộ test case thủ công (85 trường hợp) được quản lý trong Google Sheet bên dưới.
 ---
-## 🤖 Công cụ AI sử dụng
-**Figma** Thiết kế giao diện
-**ChatGPT** Viết tài liệu SRS, sinh test case
-**Claude** Review code, vẽ sơ đồ UML, viết README
-**Gemini** Bổ sung test case phi chức năng
-**GitHub Copilot** Viết & refactor code trực tiếp trong editor, chạy lệnh terminal
----
 ## 📄 Tài liệu dự án
-📋 **SRS — Đặc tả yêu cầu phần mềm**  [Google Doc](https://docs.google.com/document/d/1GmZCqhZh6KnKdLz0r3Pas7yoLuSIMBlKuT-IqvW__2c/edit?usp=sharing) 
-🎨 **Figma — Thiết kế giao diện**  [Figma Make](https://www.figma.com/make/j6Z16GR9JIr2zBebhnu5kW/Sudoku-Game-UI-Design?t=Xdm0KuwdNyK5nnUL-1) |
-🧪 **Test Case — Bảng kiểm thử**  [Google Sheets](https://docs.google.com/spreadsheets/d/1XYO3OVcCQqtQlSInIwaym0W9j9YV83FnqOHGLJjBj08/edit?usp=sharing) 
+- **SRS — Đặc tả yêu cầu phần mềm**  [Google Doc](https://docs.google.com/document/d/1GmZCqhZh6KnKdLz0r3Pas7yoLuSIMBlKuT-IqvW__2c/edit?usp=sharing)
+- **Figma — Thiết kế giao diện**  [Figma Make](https://www.figma.com/make/j6Z16GR9JIr2zBebhnu5kW/Sudoku-Game-UI-Design?t=Xdm0KuwdNyK5nnUL-1) |
+- **Test Case — Bảng kiểm thử**  [Google Sheets](https://docs.google.com/spreadsheets/d/1XYO3OVcCQqtQlSInIwaym0W9j9YV83FnqOHGLJjBj08/edit?usp=sharing) 
